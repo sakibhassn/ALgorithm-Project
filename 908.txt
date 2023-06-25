@@ -1,0 +1,113 @@
+import java.util.Arrays;
+import java.util.Scanner;
+
+class Main {
+    static class Link implements Comparable<Link> {
+        int x, y, v;
+
+        public Link(int x, int y, int v) {
+            this.x = x;
+            this.y = y;
+            this.v = v;
+        }
+
+        @Override
+        public int compareTo(Link other) {
+            return Integer.compare(this.v, other.v);
+        }
+    }
+
+    static int[] parent;
+    static int[] rank;
+
+    static void makeInit(int n) {
+        parent = new int[n + 1];
+        rank = new int[n + 1];
+
+        for (int i = 0; i <= n; i++) {
+            parent[i] = i;
+            rank[i] = 1;
+        }
+    }
+
+    static int findParent(int x) {
+        if (parent[x] != x) {
+            parent[x] = findParent(parent[x]);
+        }
+        return parent[x];
+    }
+
+    static void pLink(int x, int y) {
+        if (rank[x] > rank[y]) {
+            rank[x] += rank[y];
+            parent[y] = x;
+        } else {
+            rank[y] += rank[x];
+            parent[x] = y;
+        }
+    }
+
+    static int union(int x, int y) {
+        x = findParent(x);
+        y = findParent(y);
+        if (x != y) {
+            pLink(x, y);
+            return 1;
+        }
+        return 0;
+    }
+
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int a, b, c;
+        int flag = 0;
+
+        while (sc.hasNextInt()) {
+            int N = sc.nextInt();
+            int sum = 0;
+
+            for (int i = 1; i < N; i++) {
+                a = sc.nextInt();
+                b = sc.nextInt();
+                c = sc.nextInt();
+                sum += c;
+            }
+
+            if (flag != 0) {
+                System.out.println();
+            }
+            flag = 1;
+            System.out.println(sum);
+
+            int K = sc.nextInt();
+            Link[] D = new Link[K];
+            for (int i = 0; i < K; i++) {
+                a = sc.nextInt();
+                b = sc.nextInt();
+                c = sc.nextInt();
+                D[i] = new Link(a, b, c);
+            }
+
+            int M = sc.nextInt();
+            D = Arrays.copyOf(D, K + M);
+            for (int i = K; i < K + M; i++) {
+                a = sc.nextInt();
+                b = sc.nextInt();
+                c = sc.nextInt();
+                D[i] = new Link(a, b, c);
+            }
+
+            sum = 0;
+            Arrays.sort(D);
+            makeInit(N);
+
+            for (int i = 0; i < K + M; i++) {
+                sum += union(D[i].x, D[i].y) * D[i].v;
+            }
+
+            System.out.println(sum);
+        }
+
+        sc.close();
+    }
+}
